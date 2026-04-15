@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EBN GAMEZ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.png" type="image/png" id="dynamic-favicon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0a0a0f;--panel:#10101a;--panel2:#16162a;--border:#2a2a4a;
+      --cyan:#00fff5;--magenta:#ff00cc;--yellow:#ffe600;--green:#00ff88;
+      --orange:#ff6600;--red:#ff2244;--white:#f0f0ff;--dim:#6060a0;
+      --scanline:rgba(0,0,0,0.18);
+      --accent1:var(--cyan);--accent2:var(--magenta);
+    }
+
+    /* ===== THEMES ===== */
+    [data-theme="synthwave"] {
+      --bg:#0a0a0f;--panel:#10101a;--panel2:#16162a;--border:#2a2a4a;
+      --cyan:#00fff5;--magenta:#ff00cc;--yellow:#ffe600;--green:#00ff88;
+      --accent1:var(--cyan);--accent2:var(--magenta);
+    }
+    [data-theme="matrix"] {
+      --bg:#000d00;--panel:#001500;--panel2:#001a00;--border:#003300;
+      --cyan:#00ff41;--magenta:#00cc33;--yellow:#aaff00;--green:#00ff88;
+      --orange:#55ff00;--red:#ff4400;--white:#ccffcc;--dim:#336633;
+      --accent1:#00ff41;--accent2:#00cc33;
+    }
+    [data-theme="amber"] {
+      --bg:#0d0800;--panel:#1a1000;--panel2:#1f1400;--border:#3d2a00;
+      --cyan:#ffb300;--magenta:#ff8c00;--yellow:#ffd700;--green:#ff6600;
+      --orange:#ff4500;--red:#ff2200;--white:#fff8e1;--dim:#806030;
+      --accent1:#ffb300;--accent2:#ff8c00;
+    }
+    [data-theme="vapor"] {
+      --bg:#0d0018;--panel:#150025;--panel2:#1a002e;--border:#3d0066;
+      --cyan:#ff71ce;--magenta:#b967ff;--yellow:#fffb96;--green:#05ffa1;
+      --orange:#ff9a3c;--red:#ff4466;--white:#fff0ff;--dim:#7a3a8a;
+      --accent1:#ff71ce;--accent2:#b967ff;
+    }
+    [data-theme="ice"] {
+      --bg:#050d1a;--panel:#08152a;--panel2:#0a1a35;--border:#1a3a5a;
+      --cyan:#7fefff;--magenta:#5bc8ff;--yellow:#e0f4ff;--green:#00e5ff;
+      --orange:#80bfff;--red:#ff6080;--white:#e8f4ff;--dim:#3a6080;
+      --accent1:#7fefff;--accent2:#5bc8ff;
+    }
+    [data-theme="inferno"] {
+      --bg:#0f0500;--panel:#1a0800;--panel2:#200900;--border:#4a1500;
+      --cyan:#ff6600;--magenta:#ff2200;--yellow:#ffcc00;--green:#ff8c00;
+      --orange:#ff4400;--red:#ff1100;--white:#fff5ee;--dim:#804020;
+      --accent1:#ff6600;--accent2:#ff2200;
+    }
+
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    *::-webkit-scrollbar{width:6px;height:6px;}
+    *::-webkit-scrollbar-track{background:var(--bg);}
+    *::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+    *::-webkit-scrollbar-thumb:hover{background:var(--cyan);}
+    body{font-family:'VT323',monospace;background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden;position:relative;transition:background .3s,color .3s;}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,var(--scanline) 2px,var(--scanline) 4px);pointer-events:none;z-index:9998;}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,245,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,245,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+    .ambient{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(120px);opacity:.10;}
+    .amb1{width:600px;height:400px;background:var(--cyan);top:-100px;left:-100px;animation:drift 12s ease-in-out infinite alternate;}
+    .amb2{width:500px;height:500px;background:var(--magenta);bottom:-100px;right:-100px;animation:drift 16s ease-in-out infinite alternate-reverse;}
+    .amb3{width:300px;height:300px;background:var(--yellow);top:40%;left:50%;animation:drift 10s ease-in-out infinite alternate;}
+    @keyframes drift{0%{transform:translate(0,0)scale(1);}100%{transform:translate(30px,20px)scale(1.1);}}
+
+    /* LOCKSCREEN */
+    #lockscreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .6s ease;}
+    #lockscreen::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.2) 2px,rgba(0,0,0,0.2) 4px);pointer-events:none;}
+    .lock-box{position:relative;z-index:1;background:var(--panel);border:2px solid var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3),inset 0 0 40px rgba(0,255,245,.04);border-radius:4px;padding:48px 40px;width:380px;text-align:center;animation:lockIn .5s ease both;}
+    @keyframes lockIn{from{opacity:0;transform:scale(.9)translateY(20px);}to{opacity:1;transform:scale(1)translateY(0);}}
+    .lock-box::before,.lock-box::after{content:'■ ■ ■';position:absolute;font-size:8px;color:var(--cyan);opacity:.5;letter-spacing:4px;}
+    .lock-box::before{top:10px;left:14px;}
+    .lock-box::after{bottom:10px;right:14px;}
+    .lock-logo-big{font-family:'Press Start 2P',monospace;font-size:28px;color:var(--cyan);text-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);margin-bottom:6px;animation:flicker 4s ease-in-out infinite;}
+    @keyframes flicker{0%,19%,21%,100%{opacity:1;}20%{opacity:.6;}}
+    .lock-tagline{font-family:'VT323',monospace;font-size:20px;color:var(--magenta);letter-spacing:3px;margin-bottom:36px;}
+    .lock-label{font-family:'VT323',monospace;font-size:18px;color:var(--dim);text-align:left;margin-bottom:6px;letter-spacing:1px;}
+    .lock-input{width:100%;background:#000;border:2px solid var(--border);border-radius:2px;color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:18px;padding:12px 14px;outline:none;letter-spacing:4px;margin-bottom:16px;transition:border-color .2s,box-shadow .2s;caret-color:var(--cyan);}
+    .lock-input:focus{border-color:var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);}
+    .lock-btn{width:100%;padding:14px;background:transparent;border:2px solid var(--cyan);border-radius:2px;color:var(--cyan);font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;text-shadow:0 0 8px var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);transition:all .15s;}
+    .lock-btn:hover{background:var(--cyan);color:#000;text-shadow:none;box-shadow:0 0 20px rgba(0,255,245,.6);transform:translateY(-2px);}
+    .lock-btn:active{transform:translateY(0);}
+    #pwerr{font-family:'VT323',monospace;font-size:20px;color:var(--red);text-shadow:0 0 8px var(--red);margin-top:12px;display:none;animation:shake .3s ease;}
+    @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+    /* TICKER */
+    .ticker{background:var(--magenta);overflow:hidden;height:28px;display:flex;align-items:center;position:relative;z-index:1;}
+    .ticker-inner{display:flex;gap:0;animation:tickerAnim 35s linear infinite;white-space:nowrap;}
+    @keyframes tickerAnim{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    .ticker-item{font-family:'Press Start 2P',monospace;font-size:9px;color:#000;padding:0 40px;letter-spacing:1px;}
+
+    /* HEADER */
+    .header{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.92);border-bottom:2px solid var(--cyan);box-shadow:0 2px 20px rgba(0,255,245,.15);backdrop-filter:blur(10px);}
+    .header-inner{max-width:1300px;margin:0 auto;padding:0 24px;height:70px;display:flex;align-items:center;gap:24px;}
+    .logo{font-family:'Press Start 2P',monospace;font-size:20px;color:var(--cyan);text-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);white-space:nowrap;cursor:default;transition:transform .2s ease,text-shadow .2s ease;flex-shrink:0;user-select:none;}
+    .logo:hover{transform:scale(1.1);text-shadow:0 0 16px var(--cyan),0 0 48px rgba(0,255,245,.7);}
+    .logo span{color:var(--magenta);text-shadow:0 0 8px var(--magenta),0 0 24px rgba(255,0,204,.3);}
+    .hdr-sep{font-family:'VT323',monospace;font-size:24px;color:var(--border);flex-shrink:0;}
+    .search-wrap{flex:1;max-width:480px;position:relative;}
+    .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-family:'VT323',monospace;font-size:20px;color:var(--dim);pointer-events:none;}
+    .search-input{width:100%;padding:10px 14px 10px 38px;background:var(--panel2);border:2px solid var(--border);border-radius:2px;color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:16px;outline:none;transition:border-color .2s,box-shadow .2s;caret-color:var(--cyan);}
+    .search-input::placeholder{color:var(--dim);}
+    .search-input:focus{border-color:var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);}
+    .coin-box{flex-shrink:0;display:flex;align-items:center;gap:8px;background:var(--panel2);border:2px solid var(--yellow);border-radius:2px;padding:6px 14px;font-family:'Press Start 2P',monospace;font-size:9px;color:var(--yellow);text-shadow:0 0 8px var(--yellow),0 0 24px rgba(255,230,0,.3);box-shadow:0 0 8px var(--yellow),0 0 24px rgba(255,230,0,.3);cursor:default;transition:transform .2s;}
+    .coin-box:hover{transform:scale(1.06);}
+    .coin-icon{font-size:16px;animation:coinSpin 3s linear infinite;display:inline-block;}
+    @keyframes coinSpin{0%,100%{transform:scaleX(1);}50%{transform:scaleX(.1);}}
+
+    /* SETTINGS BUTTON */
+    .settings-btn{flex-shrink:0;background:transparent;border:2px solid var(--border);border-radius:2px;color:var(--dim);font-family:'VT323',monospace;font-size:22px;padding:6px 12px;cursor:pointer;transition:all .15s;line-height:1;}
+    .settings-btn:hover{border-color:var(--cyan);color:var(--cyan);text-shadow:0 0 8px var(--cyan);}
+
+    /* CAT SCROLL BAR (PILL NAV) */
+    .cat-scroll-bar{position:sticky;top:70px;z-index:90;background:rgba(10,10,15,.96);border-bottom:2px solid var(--magenta);backdrop-filter:blur(10px);overflow:hidden;}
+    .cat-scroll-track{display:flex;align-items:center;padding:0 8px;gap:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;}
+    .cat-scroll-track::-webkit-scrollbar{display:none;}
+    .cat-pills{display:flex;gap:6px;padding:8px 4px;flex-shrink:0;}
+    .cat-pill{display:flex;align-items:center;gap:6px;padding:6px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;color:var(--dim);font-family:'VT323',monospace;font-size:17px;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+    .cat-pill:hover{border-color:var(--magenta);color:var(--white);}
+    .cat-pill.active{background:rgba(255,0,204,.12);border-color:var(--magenta);color:var(--magenta);text-shadow:0 0 6px rgba(255,0,204,.5);}
+    .cat-pill-icon{font-size:14px;}
+    .cat-pill-count{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1px 6px;}
+    .cat-pill.active .cat-pill-count{border-color:var(--magenta);color:var(--magenta);}
+
+    /* MAIN */
+    .main{max-width:1300px;margin:0 auto;padding:32px 24px 80px;position:relative;z-index:1;}
+
+    /* SECTION HEADER */
+    .section-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+    .section-title{font-family:'Press Start 2P',monospace;font-size:13px;color:var(--cyan);text-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);letter-spacing:1px;white-space:nowrap;}
+    .section-title.magenta{color:var(--magenta);text-shadow:0 0 8px var(--magenta),0 0 24px rgba(255,0,204,.3);}
+    .section-title.yellow{color:var(--yellow);text-shadow:0 0 8px var(--yellow),0 0 24px rgba(255,230,0,.3);}
+    .section-rule{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--border) 0px,var(--border) 6px,transparent 6px,transparent 12px);}
+    .section-count-badge{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--dim);white-space:nowrap;}
+    .retro-btn{font-family:'VT323',monospace;font-size:16px;color:var(--dim);background:transparent;border:1px solid var(--border);border-radius:2px;padding:4px 12px;cursor:pointer;letter-spacing:1px;transition:all .15s;}
+    .retro-btn:hover{border-color:var(--red);color:var(--red);text-shadow:0 0 8px var(--red);}
+
+    /* GRID */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px;margin-bottom:48px;}
+
+    /* CARD */
+    .card{background:var(--panel);border:2px solid var(--border);border-radius:2px;padding:14px 12px 12px;cursor:pointer;position:relative;overflow:hidden;transition:transform .15s ease,border-color .15s,box-shadow .15s;animation:cardIn .3s ease both;}
+    @keyframes cardIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .card::before{content:'';position:absolute;top:0;left:0;width:8px;height:8px;border-top:2px solid var(--cyan);border-left:2px solid var(--cyan);opacity:0;transition:opacity .15s;}
+    .card::after{content:'';position:absolute;bottom:0;right:0;width:8px;height:8px;border-bottom:2px solid var(--cyan);border-right:2px solid var(--cyan);opacity:0;transition:opacity .15s;}
+    .card:hover{transform:translateY(-4px)scale(1.02);border-color:var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3),inset 0 0 20px rgba(0,255,245,.03);}
+    .card:hover::before,.card:hover::after{opacity:1;}
+    .card:active{transform:translateY(-2px)scale(1.01);}
+    .card-icon-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+    .card-emoji{font-size:22px;transition:transform .2s ease;flex-shrink:0;}
+    .card:hover .card-emoji{transform:scale(1.3)rotate(-8deg);}
+    .card-cat-pill{font-family:'Share Tech Mono',monospace;font-size:9px;padding:2px 6px;border-radius:1px;border:1px solid;letter-spacing:.5px;text-transform:uppercase;opacity:.7;}
+    .card-title{font-family:'VT323',monospace;font-size:19px;color:var(--white);line-height:1.2;padding-right:28px;transition:color .15s;}
+    .card:hover .card-title{color:var(--cyan);}
+    .card-sub{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);margin-top:5px;}
+    .card-play-overlay{position:absolute;inset:0;background:rgba(0,255,245,.05);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s;pointer-events:none;}
+    .card:hover .card-play-overlay{opacity:1;}
+    .play-btn-retro{font-family:'Press Start 2P',monospace;font-size:9px;color:#000;background:var(--cyan);padding:8px 12px;border:none;border-radius:1px;box-shadow:3px 3px 0 #006677;transform:translateY(6px);transition:transform .15s;letter-spacing:1px;}
+    .card:hover .play-btn-retro{transform:translateY(0);}
+    .fav{position:absolute;top:8px;right:8px;width:26px;height:26px;background:transparent;border:1px solid var(--border);border-radius:2px;color:var(--dim);font-size:14px;cursor:pointer;display:grid;place-items:center;transition:all .15s;z-index:2;}
+    .fav:hover{border-color:var(--yellow);color:var(--yellow);text-shadow:0 0 8px var(--yellow),0 0 24px rgba(255,230,0,.3);transform:scale(1.2)rotate(12deg);}
+    .fav.on{color:var(--yellow);border-color:var(--yellow);text-shadow:0 0 8px var(--yellow);}
+
+    /* THEME COLORS FOR PILLS */
+    .theme-cyan{color:var(--cyan);border-color:var(--cyan);}
+    .theme-mag{color:var(--magenta);border-color:var(--magenta);}
+    .theme-yellow{color:var(--yellow);border-color:var(--yellow);}
+    .theme-green{color:var(--green);border-color:var(--green);}
+    .theme-orange{color:var(--orange);border-color:var(--orange);}
+    .theme-red{color:var(--red);border-color:var(--red);}
+
+    /* EMPTY */
+    .empty-retro{grid-column:1/-1;border:2px dashed var(--border);border-radius:2px;padding:32px;text-align:center;font-family:'VT323',monospace;font-size:22px;color:var(--dim);letter-spacing:2px;}
+    .empty-retro span{display:block;font-size:40px;margin-bottom:10px;}
+
+    /* TOAST */
+    #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%)translateY(20px);background:var(--panel);border:2px solid var(--cyan);box-shadow:0 0 8px var(--cyan),0 0 24px rgba(0,255,245,.3);border-radius:2px;padding:10px 24px;font-family:'VT323',monospace;font-size:20px;color:var(--cyan);text-shadow:0 0 8px var(--cyan);z-index:500;opacity:0;transition:all .25s ease;white-space:nowrap;pointer-events:none;letter-spacing:2px;}
+    #toast.show{opacity:1;transform:translateX(-50%)translateY(0);}
+
+    /* NO RESULTS */
+    #no-results{display:none;text-align:center;padding:60px 20px;font-family:'Press Start 2P',monospace;font-size:12px;color:var(--dim);line-height:2.5;}
+    #no-results .nr-icon{font-size:48px;display:block;margin-bottom:16px;}
+
+    /* ===== SETTINGS MODAL ===== */
+    #settings-overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+    #settings-overlay.open{display:flex;}
+    .settings-panel{background:var(--panel);border:2px solid var(--cyan);box-shadow:0 0 12px var(--cyan),0 0 40px rgba(0,255,245,.2);border-radius:4px;width:min(560px,95vw);max-height:90vh;overflow-y:auto;position:relative;animation:settingsIn .25s ease both;}
+    @keyframes settingsIn{from{opacity:0;transform:scale(.95)translateY(-10px);}to{opacity:1;transform:scale(1)translateY(0);}}
+    .settings-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:2px solid var(--border);}
+    .settings-title{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--cyan);text-shadow:0 0 8px var(--cyan);letter-spacing:1px;}
+    .settings-close{background:transparent;border:2px solid var(--border);border-radius:2px;color:var(--dim);font-family:'Press Start 2P',monospace;font-size:10px;padding:6px 10px;cursor:pointer;transition:all .15s;}
+    .settings-close:hover{border-color:var(--red);color:var(--red);}
+    .settings-body{padding:24px;}
+    .settings-section{margin-bottom:28px;}
+    .settings-section-label{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--magenta);text-shadow:0 0 6px var(--magenta);letter-spacing:2px;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .settings-section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* THEME PICKER */
+    .theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .theme-card{border:2px solid var(--border);border-radius:3px;padding:10px 8px;cursor:pointer;text-align:center;transition:all .15s;position:relative;}
+    .theme-card:hover{transform:translateY(-2px);}
+    .theme-card.active{border-color:var(--cyan);box-shadow:0 0 8px var(--cyan);}
+    .theme-card.active::after{content:'✓';position:absolute;top:4px;right:6px;font-size:12px;color:var(--cyan);}
+    .theme-swatch{width:100%;height:28px;border-radius:2px;margin-bottom:6px;display:flex;overflow:hidden;}
+    .theme-swatch-a,.theme-swatch-b,.theme-swatch-c{flex:1;}
+    .theme-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);}
+    .theme-card.active .theme-name{color:var(--cyan);}
+
+    /* TOGGLE */
+    .settings-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:2px;margin-bottom:8px;}
+    .settings-row-label{font-family:'VT323',monospace;font-size:20px;color:var(--white);letter-spacing:1px;}
+    .settings-row-desc{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--dim);margin-top:2px;}
+    .toggle-switch{position:relative;width:44px;height:22px;flex-shrink:0;}
+    .toggle-switch input{opacity:0;width:0;height:0;position:absolute;}
+    .toggle-track{position:absolute;inset:0;background:var(--panel);border:2px solid var(--border);border-radius:11px;cursor:pointer;transition:all .2s;}
+    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;background:var(--dim);border-radius:50%;transition:all .2s;}
+    input:checked+.toggle-track{background:rgba(0,255,245,.1);border-color:var(--cyan);}
+    input:checked+.toggle-track::after{transform:translateX(22px);background:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+
+    /* TAB NAMER + FAVICON */
+    .settings-input{width:100%;background:var(--panel2);border:2px solid var(--border);border-radius:2px;color:var(--cyan);font-family:'Share Tech Mono',monospace;font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;caret-color:var(--cyan);margin-bottom:8px;}
+    .settings-input:focus{border-color:var(--cyan);box-shadow:0 0 6px var(--cyan);}
+    .settings-apply-btn{background:transparent;border:2px solid var(--cyan);border-radius:2px;color:var(--cyan);font-family:'VT323',monospace;font-size:18px;padding:8px 18px;cursor:pointer;letter-spacing:1px;transition:all .15s;text-shadow:0 0 6px var(--cyan);}
+    .settings-apply-btn:hover{background:var(--cyan);color:#000;text-shadow:none;}
+
+    /* FAVICON UPLOAD */
+    .favicon-upload-zone{border:2px dashed var(--border);border-radius:2px;padding:18px;text-align:center;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+    .favicon-upload-zone:hover,.favicon-upload-zone.drag-over{border-color:var(--cyan);background:rgba(0,255,245,.04);}
+    .favicon-upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+    .favicon-upload-label{font-family:'VT323',monospace;font-size:18px;color:var(--dim);letter-spacing:1px;}
+    .favicon-upload-label span{display:block;font-size:30px;margin-bottom:6px;}
+    .favicon-preview{width:32px;height:32px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;margin:8px auto 0;}
+
+    /* BROKEN LIST */
+    .broken-item{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--panel2);border:1px solid var(--border);border-radius:2px;margin-bottom:4px;}
+    .broken-item-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:340px;}
+    .broken-item-remove{background:transparent;border:1px solid var(--border);border-radius:2px;color:var(--dim);font-family:'VT323',monospace;font-size:14px;padding:2px 8px;cursor:pointer;flex-shrink:0;transition:all .15s;}
+    .broken-item-remove:hover{border-color:var(--red);color:var(--red);}
+
+    /* CONTEXT MENU */
+    #ctx-menu{display:none;position:fixed;z-index:8000;background:var(--panel);border:2px solid var(--cyan);box-shadow:0 0 12px rgba(0,255,245,.3);border-radius:2px;min-width:180px;overflow:hidden;}
+    #ctx-menu.open{display:block;}
+    .ctx-item{font-family:'VT323',monospace;font-size:18px;color:var(--white);padding:10px 16px;cursor:pointer;letter-spacing:1px;transition:background .1s;}
+    .ctx-item:hover{background:rgba(0,255,245,.08);color:var(--cyan);}
+    .ctx-item.danger:hover{background:rgba(255,34,68,.08);color:var(--red);}
+    .ctx-sep{height:1px;background:var(--border);margin:2px 0;}
+
+    @media(max-width:768px){
+      .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+      .logo{font-size:14px;}
+      .coin-box{display:none;}
+      .cat-pill .cat-pill-icon{display:none;}
+    }
+    @media(max-width:480px){
+      .header-inner{gap:12px;padding:0 14px;}
+      .main{padding:20px 14px 60px;}
+      .grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+    }
+  </style>
+</head>
+<body>
+
+<div class="ambient amb1"></div>
+<div class="ambient amb2"></div>
+<div class="ambient amb3"></div>
+<div id="toast"></div>
+
+<!-- LOCKSCREEN -->
+<div id="lockscreen">
+  <div class="lock-box">
+    <div class="lock-logo-big">EBN</div>
+    <div class="lock-tagline">INSERT PASSWORD</div>
+    <div class="lock-label">&gt; ENTER PASSWORD:</div>
+    <input id="pw" class="lock-input" type="password" placeholder="••••••••••" autocomplete="off" />
+    <button id="unlock" class="lock-btn">[ PRESS START ]</button>
+    <div id="pwerr">&#10060; ACCESS DENIED</div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settings-overlay">
+  <div class="settings-panel">
+    <div class="settings-header">
+      <div class="settings-title">⚙ SYSTEM SETTINGS</div>
+      <button class="settings-close" onclick="closeSettings()">[ X ]</button>
+    </div>
+    <div class="settings-body">
+
+      <!-- THEMES -->
+      <div class="settings-section">
+        <div class="settings-section-label">🎨 THEME</div>
+        <div class="theme-grid" id="theme-grid">
+          <div class="theme-card active" data-theme="synthwave" onclick="applyTheme('synthwave',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#00fff5"></div><div class="theme-swatch-b" style="background:#ff00cc"></div><div class="theme-swatch-c" style="background:#0a0a0f"></div></div>
+            <div class="theme-name">SYNTHWAVE</div>
+          </div>
+          <div class="theme-card" data-theme="matrix" onclick="applyTheme('matrix',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#00ff41"></div><div class="theme-swatch-b" style="background:#00cc33"></div><div class="theme-swatch-c" style="background:#000d00"></div></div>
+            <div class="theme-name">MATRIX</div>
+          </div>
+          <div class="theme-card" data-theme="amber" onclick="applyTheme('amber',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#ffb300"></div><div class="theme-swatch-b" style="background:#ff8c00"></div><div class="theme-swatch-c" style="background:#0d0800"></div></div>
+            <div class="theme-name">AMBER</div>
+          </div>
+          <div class="theme-card" data-theme="vapor" onclick="applyTheme('vapor',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#ff71ce"></div><div class="theme-swatch-b" style="background:#b967ff"></div><div class="theme-swatch-c" style="background:#0d0018"></div></div>
+            <div class="theme-name">VAPORWAVE</div>
+          </div>
+          <div class="theme-card" data-theme="ice" onclick="applyTheme('ice',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#7fefff"></div><div class="theme-swatch-b" style="background:#5bc8ff"></div><div class="theme-swatch-c" style="background:#050d1a"></div></div>
+            <div class="theme-name">ICE COLD</div>
+          </div>
+          <div class="theme-card" data-theme="inferno" onclick="applyTheme('inferno',this)">
+            <div class="theme-swatch"><div class="theme-swatch-a" style="background:#ff6600"></div><div class="theme-swatch-b" style="background:#ff2200"></div><div class="theme-swatch-c" style="background:#0f0500"></div></div>
+            <div class="theme-name">INFERNO</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOGGLES -->
+      <div class="settings-section">
+        <div class="settings-section-label">🔧 OPTIONS</div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">OPEN IN ABOUT:BLANK</div>
+            <div class="settings-row-desc">Hides game URL from address bar</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-blank" checked onchange="saveSettings()">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">SCANLINE EFFECT</div>
+            <div class="settings-row-desc">Retro CRT scanlines overlay</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-scanlines" checked onchange="toggleScanlines()">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">HIDE BROKEN GAMES</div>
+            <div class="settings-row-desc">Hides games you've marked as broken</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-hide-broken" onchange="saveSettings();renderView(currentCat);">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+      </div>
+
+      <!-- BROKEN GAMES -->
+      <div class="settings-section">
+        <div class="settings-section-label">🚫 BROKEN GAMES LIST</div>
+        <div id="broken-list-wrap">
+          <div id="broken-list-empty" style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--dim);padding:10px 0;">No broken games marked yet. Right-click any game card to mark it.</div>
+          <div id="broken-list"></div>
+        </div>
+        <button class="settings-apply-btn" style="margin-top:8px" onclick="clearAllBroken()">[CLEAR ALL BROKEN]</button>
+      </div>
+
+      <!-- TAB NAMER -->
+      <div class="settings-section">
+        <div class="settings-section-label">🏷 TAB NAME</div>
+        <input type="text" id="tab-name-input" class="settings-input" placeholder="EBN GAMEZ" maxlength="60">
+        <button class="settings-apply-btn" onclick="applyTabName()">[ APPLY ]</button>
+      </div>
+
+      <!-- FAVICON UPLOAD -->
+      <div class="settings-section">
+        <div class="settings-section-label">🖼 CUSTOM FAVICON</div>
+        <div class="favicon-upload-zone" id="favicon-zone">
+          <input type="file" id="favicon-input" accept="image/*" onchange="handleFaviconUpload(this)">
+          <div class="favicon-upload-label">
+            <span>📁</span>
+            DROP IMAGE OR CLICK TO UPLOAD<br>
+            <span style="font-size:12px;font-family:'Share Tech Mono',monospace;color:var(--dim)">PNG, ICO, JPG — any size</span>
+          </div>
+          <img id="favicon-preview" class="favicon-preview" style="display:none">
+        </div>
+        <button class="settings-apply-btn" style="margin-top:8px" onclick="resetFavicon()">[ RESET FAVICON ]</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="ctx-menu">
+  <div class="ctx-item" id="ctx-play">▶ PLAY</div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-item" id="ctx-fav">★ TOGGLE FAVORITE</div>
+  <div class="ctx-item danger" id="ctx-broken">🚫 MARK AS BROKEN</div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker"><div class="ticker-inner" id="ticker-inner"></div></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">EBN<span>.</span>GZ</div>
+    <div class="hdr-sep">//</div>
+    <div class="search-wrap">
+      <div class="search-icon">&#128269;</div>
+      <input id="search" class="search-input" type="search" placeholder="SEARCH GAMES..." autocomplete="off" />
+    </div>
+    <div class="coin-box">
+      <span class="coin-icon">&#129689;</span>
+      <span id="game-count-num">000</span>&nbsp;GAMES
+    </div>
+    <button class="settings-btn" onclick="openSettings()" title="Settings">⚙</button>
+  </div>
+</header>
+
+<!-- CATEGORY SCROLL BAR (NEW TOP BAR) -->
+<div class="cat-scroll-bar">
+  <div class="cat-scroll-track" id="cat-scroll-track">
+    <div class="cat-pills" id="cat-pills"></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main" id="main">
+  <div id="no-results">
+    <span class="nr-icon">&#128126;</span>
+    NO GAMES FOUND<br>
+    <span style="font-size:10px;color:var(--dim)">TRY A DIFFERENT SEARCH</span>
+  </div>
+</main>
+
+<script>
+const PASSWORD='unnblocked';
+const STORAGE_KEY='ebn_link_organizer_v1';
+const SETTINGS_KEY='ebn_settings_v1';
+const MAX_RECENTS=12;
+
+// ===== SETTINGS =====
+const SETTINGS_DEFAULTS={theme:'synthwave',openBlank:true,scanlines:true,tabName:'EBN GAMEZ',faviconUrl:null,hideBroken:false};
+
+function loadSettings(){
+  try{const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');return Object.assign({},SETTINGS_DEFAULTS,s||{});}
+  catch{return Object.assign({},SETTINGS_DEFAULTS);}
+}
+function saveSettings(){
+  const s=loadSettings();
+  s.openBlank=document.getElementById('toggle-blank').checked;
+  s.scanlines=document.getElementById('toggle-scanlines').checked;
+  s.hideBroken=document.getElementById('toggle-hide-broken').checked;
+  localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+}
+function toggleScanlines(){
+  saveSettings();
+  const s=loadSettings();
+  document.body.style.setProperty('--scanline',s.scanlines?'rgba(0,0,0,0.18)':'rgba(0,0,0,0)');
+}
+function applyTheme(theme,el){
+  document.documentElement.setAttribute('data-theme',theme);
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const s=loadSettings();s.theme=theme;localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+}
+function applyTabName(){
+  const val=document.getElementById('tab-name-input').value.trim()||'EBN GAMEZ';
+  document.title=val;
+  const s=loadSettings();s.tabName=val;localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+  showToast('✓ TAB NAME UPDATED');
+}
+function handleFaviconUpload(input){
+  if(!input.files||!input.files[0])return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const url=e.target.result;
+    setFavicon(url);
+    document.getElementById('favicon-preview').src=url;
+    document.getElementById('favicon-preview').style.display='block';
+    const s=loadSettings();s.faviconUrl=url;localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+    showToast('✓ FAVICON UPDATED');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+function setFavicon(url){
+  let link=document.getElementById('dynamic-favicon');
+  if(!link){link=document.createElement('link');link.rel='icon';link.id='dynamic-favicon';document.head.appendChild(link);}
+  link.href=url;
+}
+function resetFavicon(){
+  setFavicon('/favicon.png');
+  document.getElementById('favicon-preview').style.display='none';
+  const s=loadSettings();s.faviconUrl=null;localStorage.setItem(SETTINGS_KEY,JSON.stringify(s));
+  showToast('✓ FAVICON RESET');
+}
+
+// ===== BROKEN GAMES =====
+const BROKEN_KEY='ebn_broken_v1';
+function loadBroken(){try{return JSON.parse(localStorage.getItem(BROKEN_KEY)||'[]');}catch{return[];}}
+function saveBroken(list){localStorage.setItem(BROKEN_KEY,JSON.stringify(list));}
+function isBroken(id){return loadBroken().includes(id);}
+function markBroken(id){const l=loadBroken();if(!l.includes(id)){l.push(id);saveBroken(l);}renderBrokenList();renderView(currentCat);}
+function unmarkBroken(id){saveBroken(loadBroken().filter(x=>x!==id));renderBrokenList();renderView(currentCat);}
+function clearAllBroken(){saveBroken([]);renderBrokenList();renderView(currentCat);showToast('✓ BROKEN LIST CLEARED');}
+function renderBrokenList(){
+  const list=loadBroken();
+  const el=document.getElementById('broken-list');
+  const empty=document.getElementById('broken-list-empty');
+  el.innerHTML='';
+  empty.style.display=list.length===0?'block':'none';
+  list.forEach(id=>{
+    const game=indexById[id];
+    const name=game?game.display:id;
+    const row=document.createElement('div');row.className='broken-item';
+    row.innerHTML='<span class="broken-item-name">🚫 '+name+'</span><button class="broken-item-remove" onclick="unmarkBroken(\''+id+'\')">[ X ]</button>';
+    el.appendChild(row);
+  });
+}
+
+function openSettings(){
+  document.getElementById('settings-overlay').classList.add('open');
+  const s=loadSettings();
+  document.getElementById('toggle-blank').checked=s.openBlank!==false;
+  document.getElementById('toggle-scanlines').checked=s.scanlines!==false;
+  document.getElementById('toggle-hide-broken').checked=s.hideBroken===true;
+  document.getElementById('tab-name-input').value=s.tabName||'EBN GAMEZ';
+  if(s.faviconUrl){document.getElementById('favicon-preview').src=s.faviconUrl;document.getElementById('favicon-preview').style.display='block';}
+  document.querySelectorAll('.theme-card').forEach(c=>{c.classList.toggle('active',c.dataset.theme===s.theme);});
+  renderBrokenList();
+}
+function closeSettings(){document.getElementById('settings-overlay').classList.remove('open');}
+document.getElementById('settings-overlay').addEventListener('click',function(e){if(e.target===this)closeSettings();});
+
+// Drag-over highlight
+const fzone=document.getElementById('favicon-zone');
+fzone.addEventListener('dragover',e=>{e.preventDefault();fzone.classList.add('drag-over');});
+fzone.addEventListener('dragleave',()=>fzone.classList.remove('drag-over'));
+fzone.addEventListener('drop',e=>{e.preventDefault();fzone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f){const inp=document.getElementById('favicon-input');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;handleFaviconUpload(inp);}});
+
+// Apply saved settings on load
+(function initSettings(){
+  const s=loadSettings();
+  document.documentElement.setAttribute('data-theme',s.theme||'synthwave');
+  document.title=s.tabName||'EBN GAMEZ';
+  if(s.faviconUrl)setFavicon(s.faviconUrl);
+  if(!s.scanlines)document.body.style.setProperty('--scanline','rgba(0,0,0,0)');
+})();
+
+// ===== GAME DATA & LOGIC =====
+const CATEGORIES=[
+  {id:'all',label:'ALL GAMES',icon:'&#127918;',color:'cyan'},
+  {id:'favorites',label:'FAVORITES',icon:'&#11088;',color:'yellow'},
+  {id:'recents',label:'RECENT',icon:'&#128336;',color:'green'},
+  {id:'mario',label:'MARIO',icon:'&#127812;',color:'mag'},
+  {id:'pokemon',label:'POKEMON',icon:'&#9889;',color:'yellow'},
+  {id:'sonic',label:'SONIC',icon:'&#128168;',color:'cyan'},
+  {id:'shooter',label:'SHOOTERS',icon:'&#128299;',color:'red'},
+  {id:'fighting',label:'FIGHTING',icon:'&#129354;',color:'orange'},
+  {id:'racing',label:'RACING',icon:'&#127950;',color:'orange'},
+  {id:'platformer',label:'PLATFORMER',icon:'&#127950;',color:'green'},
+  {id:'rpg',label:'RPG',icon:'&#9876;',color:'mag'},
+  {id:'sports',label:'SPORTS',icon:'&#9917;',color:'green'},
+  {id:'zombie',label:'ZOMBIE',icon:'&#129503;',color:'red'},
+  {id:'idle',label:'IDLE/CLICK',icon:'&#127850;',color:'yellow'},
+  {id:'puzzle',label:'PUZZLE',icon:'&#129513;',color:'cyan'},
+  {id:'retro',label:'RETRO',icon:'&#128126;',color:'mag'},
+  {id:'fnf',label:'FNF MODS',icon:'&#127925;',color:'mag'},
+  {id:'horror',label:'HORROR',icon:'&#128123;',color:'red'},
+  {id:'minecraft',label:'MINECRAFT',icon:'&#9935;',color:'green'},
+  {id:'simulation',label:'SIMULATION',icon:'&#127758;',color:'cyan'},
+  {id:'tower',label:'TOWER DEF',icon:'&#127984;',color:'orange'},
+  {id:'other',label:'OTHER',icon:'&#127922;',color:'cyan'},
+];
+
+const CAT_EMOJI={mario:'🍄',pokemon:'⚡',sonic:'💨',fnf:'🎵',horror:'👻',shooter:'🔫',zombie:'🧟',fighting:'🥊',racing:'🏎️',sports:'⚽',idle:'🍪',puzzle:'🧩',rpg:'⚔️',platformer:'🏃',minecraft:'⛏️',tower:'🏰',simulation:'🌍',retro:'👾',other:'🎲',favorites:'⭐',recents:'🕐',all:'🕹️'};
+const CAT_THEME={cyan:'theme-cyan',mag:'theme-mag',yellow:'theme-yellow',green:'theme-green',orange:'theme-orange',red:'theme-red'};
+
+function getCategory(n){
+  n=n.toLowerCase();
+  if(/mario|luigi|yoshi|wario|bowser|smb\b|peach|toad\b/.test(n))return'mario';
+  if(/pokemon|poke(?!y)/.test(n))return'pokemon';
+  if(/sonic|knuckles|tails|shadow the/.test(n))return'sonic';
+  if(/fnf|funkin|fridaynight/.test(n))return'fnf';
+  if(/fnaf|five nights/.test(n))return'horror';
+  if(/doom|quake|shooter|sniper|gunblood|halo\b|cod\b|warfare|raze\b|plasma|gun(?!dung)|pistol|ammo|counter.strike|half.life/.test(n))return'shooter';
+  if(/zombie|granny\b|backroom|silent.hill|resident.evil|dead(?!pool)|creep(?!er)/.test(n))return'zombie';
+  if(/mortal.?kombat|street.?fighter|fighting|brawl|smash|boxing|punch|hobo\b|bleach.vs|dragonball|dbz|killer.instinct/.test(n))return'fighting';
+  if(/race|kart|drift|moto|bmx\b|nfs\b|need.for.speed|turismo|rally|wipeout|f.zero|fzero|excitebike|highway.ra|traffic|madalin|stunt.car/.test(n))return'racing';
+  if(/basketball|soccer|football|baseball|tennis|golf|hockey|volleyball|sport|nba\b|nfl\b|fifa|madden|nhl\b|olympic/.test(n))return'sports';
+  if(/cookie|idle|clicker|miner|tycoon|incremental|dogeminer|spacebar.click|upgrade.comp/.test(n))return'idle';
+  if(/puzzle|tetris|bloxorz|2048|chess|wordle|solitaire|match|sort|bubble.shoot|blox|jigsaw|sudoku|plinko/.test(n))return'puzzle';
+  if(/zelda|final.?fantasy|\bff\d|undertale|deltarune|persona\b|metroid|kirby|earthbound|chrono|castlevania|megaman|dungeon|quest|dragon.?ball|fire.emblem|harvest.moon|animal.cross|golden.sun|kingdom.hearts/.test(n))return'rpg';
+  if(/platform|vex\b|celeste|hollow.knight|meatboy|geometry.?dash|run\b|slope\b/.test(n))return'platformer';
+  if(/minecraft|eagler|mince/.test(n))return'minecraft';
+  if(/tower.?def|bloons|\bbtd\d/.test(n))return'tower';
+  if(/horror|slender|scary.maze/.test(n))return'horror';
+  if(/galaga|pac.?man|asteroids|donkey.kong|space.invaders|\batari\b|\bnes\b|\bsnes\b|\bgba\b|retro.class|dig.dug|pitfall|loderunner|qbert|centipede|galaga/.test(n))return'retro';
+  if(/sim\b|sandbox|planet|solar.smash|solar.sand|world.builder|empire|city.build/.test(n))return'simulation';
+  return'other';
+}
+
+function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');return{recents:Array.isArray(s?.recents)?s.recents:[],favorites:Array.isArray(s?.favorites)?s.favorites:[]};}catch{return{recents:[],favorites:[]};}}
+function saveState(s){localStorage.setItem(STORAGE_KEY,JSON.stringify(s));}
+function addRecent(id){const s=loadState();s.recents=s.recents.filter(r=>r.id!==id);s.recents.unshift({id,t:Date.now()});s.recents=s.recents.slice(0,MAX_RECENTS);saveState(s);}
+function toggleFavorite(id){const s=loadState();s.favorites=s.favorites.includes(id)?s.favorites.filter(x=>x!==id):[...s.favorites,id];saveState(s);}
+function isFavorite(id){return loadState().favorites.includes(id);}
+function clearRecents(){const s=loadState();s.recents=[];saveState(s);}
+function clearFavorites(){const s=loadState();s.favorites=[];saveState(s);}
+function timeAgo(ts){const sec=Math.floor((Date.now()-ts)/1000);if(sec<10)return'JUST NOW';if(sec<60)return`${sec}S AGO`;const min=Math.floor(sec/60);if(min<60)return`${min}M AGO`;const hr=Math.floor(min/60);if(hr<24)return`${hr}H AGO`;return`${Math.floor(hr/24)}D AGO`;}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2000);}
+
+const files=['cl1','vvvvvv','wilywars','cl10bullets','cl10minutestildawn','cl12minibattles','cl1on1soccer','cl1v1lol','cl1v1tennis','cl2048','cl2048cupcakes','cl2doom','cl2Dshooting','cl3dash','cl3pandas','cl3pandasbrazil','cl3pandasfantasy','cl3pandasjapan','cl3pandasnight','cl3slices2','cl40xescape','cl4thandgoal','cl500calibercontractz','cl60secondsburgerrun','cl60secondssantarun','cl8ballclassic','cl8ballpool','cl9007199254740992','cl99balls','cl99nightsitf','clabandoned3','clabsolutemadness','clacecombat2','clacecombat3','clacegangstertaxi','clachievementunlocked','clachievmentunlocked','clachievmentunlocked2','clachievmentunlocked3','clachillies','clachillies2','clADarkRoom','cladayintheoffice','clADOFAI','cladvancewars','cladvancewars2','cladventneon','clAdventureCapatalist','cladventurecapitalist','clagariolite','clageofwar','clageofwar2','clagesofconflict','clahoysurvival','clai','clakoopasrevenge','clakoopasrevenge2','clakumanorgaiden','clalienhominid','clalienhominidgba','clalienskyinvasion','clalientransporter','clalienvspredator','clallbossesin1','clallocation','clamaze','clamidstthesky','clamigopancho','clamigopancho2','clamigopancho3','clamigopancho4','clamigopancho5','clamigopancho6','clamigopancho7','clamongus','clamorphous','clancientsins','clangry-birdsspace','clangrybirds-space','clangrybirds','clangrybirdsshowdown','clangrybirdsspace','clanimalcrossingwildworld','clanotherworld','clapotris','clappleshooter','clappleworm','claquaparkio','clarceuslegend','clarcheryworldtour','clarena','clarmormayhem2','clarsonate','clascent','clasmallworldcup','classesmentexaminationque','clasteroids','clasteroidsALT','clattackhole','clavalanche','claviamasters','claviamastersbuggy','clAwesomePirates','clawesomeplanes','clawesometanks','clawesometanks2','clB3313','clbabeltower','clbabychiccoadventure','clbabykaizo','clbabysniperinvietnam','clbackrooms','clbackrooms2D','clbackyardbaseball','clbackyardbaseball09','clbackyardbaseball10','clbackyardsoccer','clbaconmaydie','clbadbodyguards','clbadicecream','clbadmondaysimulator','clbadparenting','clbadpiggies','clbadtimesim','clbadtimesimulator','clbaldidecomp','clbaldisbasics','clbaldisbasicsremaster','clbaldisfunnewschoolultimate','clballblast','clballsandbricks','clballsandbricksgood','clbananasimulator','clbanditgunslingers','clbanjokazooie','clbanjotooie','clbankbreakout2','clbankrobbery2','clbarryhasasecret','clbas','clbaseballbros','clbasketballfrvr','clbasketballlegends','clbasketballstars','clbasketbattle','clbasketbros','clbasketrandom','clbasketrandomgood','clbasketslamdunk2','clbatterup','clbattlekarts','clbattles','clbattlesim','clbattlezone','clbazookaboy','clbballlegend','clbeachboxingsim','clbeamrider','clbearbarians','clbearsus','clben10alienforce','clben10omniverse','clben10protector','clben10racing','clben10ultimatealien','clbergentruck201x','clbfdia5b','clbigicetowertinysquare','clbigneontowertinysquare','clbigshotboxing2','clbigtowertinysquare','clbigtowertinysquare2','clbigtowertinysquare2good','clBig_Time_Butter_Baron','clbindingofisaccsheeptime','clbioevil4','clbitlife','clbitlifeencrypted','clbitplanes','clblackjack','clblackjackbattle','clblackjackhhhh','clblacksmithlab','clblastronaut','clblazedrifter','clbleachvsnaruto','clblightborne','clblobsstory2','clblockblast','clblockcraftparkour','clblockcraftshooter','clblockpost','clblockthepig','clblockydemolitionderby','clblockysnakes','clbloodmoney','clbloodtournament','clbloons','clbloons2','clbloonspp1','clbloonspp2','clbloonspp3','clbloonspp4','clbloonspp5','clbloonsTD1','clbloonsTD2','clbloonsTD3','clbloonsTD4','clbloonsTD5','clbloonsTD6scratch','clbloxorz','clblumgiracers','clBMX2','clbntts','clbobtherobber','clbobtherobber2','clbobtherobber5','clbollybeat','clbomberman','clbomberman2','clbombermanhero','clboomslingers','clbottlecracks','clbottleflip3d','clbounceback','clbouncemasters','clbouncymotors','clBountyOfOne','clbowlalt','clboxhead2playrooms','clboxheadnightmare','clboxinglive-2','clboxinglive2','clboxingrandom','clbrainrot','clbridgerace','clBTD1','clbtd5','clbtts','clbtts2','clbubbleshooter','clbubbleshooterpirate','clbubbletanks','clbubbletanks2','clbubbletanks3','clbubbletanksarenas','clbubbletankstd','clbubsy','clbuckshotroulette','clbuildnowgg','clbunnyland','clburgerandfrights','clburritobison','clburritobison2','clburritobisonlaunchalibre','clburritobisonrevenge','clbushidoblade','clcactusmccoy','clcactusmccoy2','clcannonballs3d','clcannonfodder','clcapybaraclicker','clcarcrash3','clcardrawing','clcareatscar2deluxe','clcarkingarena','clcarmods','clcarstuntsdriving','clCartoonNetworkTableTennisUltimateTournament','clcastlebloodline','clcastlecircleofmoon','clcastlevania','clcastlevania2','clcastlevania3','clcastlevaniaariaofsorrow','clcastlevaniadawnofsorrow','clcastlevanianes','clcastlewarsmodern','clcatmario','clcatmariogood','clcatslovecake2','clcavestory','clceleste','clceleste2','clcellardoor','clchaosfaction2','clcheckers','clcheesechompers3d','clcheshireinachatroom','clchess','clchessclassic','clchibiknight','clchickenscream','clchickenwar','clchipschallenge','clchoppyorc','clchronotrigger','clchuzzle','clCircloO2','clciviballs','clciviballs2','clclashofvikings','clclassof09','clcleanupio','clclearvision','clclearvision2','clclearvision3','clclearvision4','clclearvision5','clclmadnessambulation','clclubbytheseal','clclusterrush','clcoalllcdemo','clcod4','clcodblackopp','clcoddefiance','clcodenamegordon','clcodmodernwarfare','clcodworldatwar','clcoffeemaker','clcolorburst3d','clcolormatch','clcolorwatersort3d','clcombopool','clcommanderkeen4','clcommanderkeen5','clcommanderkeen6','clconkersbadfurday','clcontra','clcontra3','clcookie-clicker','clcookieclicker','clcookieclickercool','clcookieclickergood','clcookingmama','clcookingmama2','clcookingmama3','clcoreball','clcotlk','clcountmastersstickmangames','clcoverorange','clcoverorange2','clcoverorangejourneygangsters','clcoverorangejourneyknights','clcoverorangejourneypirates','clcoverorangejourneyspace','clcoverorangeplayerspack','clcoverorangeplayerspack2','clcoverorangeplayerspack3','clcrankit!','clcrashbandicoot','clcrashbandicoot2','clcrashteamracing','clcrazycars','clcrazycattle3d','clcrazychicken3D','clcrazyfrogracer','clcrazymotorcycle','clcreeperworld2','clcrossyroad','clcrunchball3000','clcs1.6','clcsds','clcsgoclicker','clctgpnitro','clcurveball','clcuttherope','clcuttheropetimetravel','clcyberbungracing','clcybersensation','cldadgame','cldadnme','cldaggerfall','cldanktomb','cldborigins','cldborigins2','cldbsniper','cldbzattacksaiyans','cldbzdevolution','cldbzsuperwarriorssonic','cldeadestate','cldeadlydescent','cldeadplate','cldeadzed','cldeadzed2','cldeathchase','cldeblob2','cldecision','cldecision2','cldecision3','cldecisionmedieval','cldeepersleep','cldeepestsword','cldeepsleep','cldefendyourcastle','cldefendyournuts','cldefendyournuts2','cldeltarune','cldeltatraveler','cldementium','cldemolitionderbycrashracing','cldiablo','cldiamondhollow','cldiamondhollow2','cldiddykong-racing','cldieinthedungeon','cldigdeep','cldigdug','cldigdug2','cldigdug26','cldigtochina','cldinodudes','cldiredecks','cldoblox','cldogeminer','cldogeminer2','cldokidokiliteratureclub','cldonkeykong','cldonkeykong64','cldonkeykongcountry','cldonkeykongcountry2','cldonkeykongcountry3','cldonkeykongnes','cldontescape','cldontescape2','cldontescape3','cldoodlejump','cldoodlejumpgoober','cldoom','cldoom2','cldoom2d','cldoom2dDOS','cldoom3pack','cldoom64','cldoomdos','cldoomemscripten','cldoomps','cldoompsalt','cldoomzio','cldouchebaglife','cldouchebagworkout','cldownthemountain','cldragonballadvance','clDragonBallZTheLegacyofGoku','clDragonQuestIX','cldrawclimber','cldrawtheline','cldreader','cldreadheadparkour','cldriftboss','cldrifthuntersmerge','cldrivemady','cldrivenwild','cldrmario','cldrweedgaster','cldubstep','clduckhunt','clducklfe5','clducklife','clducklife2','clducklife3','clducklife4','clducklifebattle','clducklifespace','clducklingsio','clducktales','cldud','cldukenukem3d','cldumpling','cldungeondeck','cldungeonraid','cldungeonsanddegenerategamblers','cldunkshot','clduskchild','cldyingdreams','cldynamiteheaddy','cleagleride','clearntodie','clearntodie2','clearthbound','clearthbound3','clearthboundsnes','clearthtaken','clearthtaken2','clearthtaken3','clearthwormjim','clearthwormjim2','clelasticface','clelectricman2','clemujs','clenchain','clendlesswar4','clendlesswar5','clendlesswar5wow','clendlesswar7','clenduro','clepicbattlefantasy5','clescalatingduel','clescaperoad-2','clescaperoad','clet','cletrianoddyssey','clevilglitch','clevolution','clexcitebike64','clextremerun3d','clfactoryballs','clfactoryballs2','clfactoryballs3','clfactoryballs4','clfairytalevsonepiece','clfallout','clfamidash','clfancypantsadventure','clfancypantsadventure2','clfancypantsadventure3','clfancysnowboarding','clfashionbattle','clfattygenius','clfearstofathomhomealone','clfeedus','clfeedus2','clfeedus3','clfeedus4','clfeedus5','clFF3','clff6','clffmysticquest','clFFsonic1','clFFsonic2','clFFsonic3','clFFsonic4','clFFsonic5','clFFsonic61','clFFsonic62','clFIFA07','clFIFA10','clFIFA11','clFIFA2000(1)','clfifa2000','clFIFA99','clFIFAinternationalsoccer','clFIFAroadtoworldcup98','clFIFAsoccer06','clFIFAsoccer95','clFIFAsoccer96','clFIFAsoccer97','clFIFAstreet2','clfinalearth2','clfinalfantasy','clfinalfantasyII','clfinalfantasytactics','clfinalfantasyVI','clfinalfantasyVII','clfinalfantasyVIId2','clfinalfantasyVIId3','clfinalfantasyVIItheothertetrr','clfinalninja','clfireblob','clfireboyandwatergirl','clfireboyandwatergirl2','clfireboyandwatergirl3','clfireboyandwatergirl5','clfireboyandwatergirl6','clfireemblem','clfisheatgettingbig','clfisquarium','clfivenightsatbaldisredone','clfivenightsatshrekshotel','clflashsonic','clfloodrunner','clfloodrunner2','clfloodrunner4','clfluidism','clfnac1','clfnac2','clFNAF','clFNAF2','clFNAF3','clFNAF4','clfnaf4halloween','clfnafanimatronics','clfnafps','clfnafsl','clfnafucn','clfnafworldd','clfnfagoti','clfnfbfdi26','clfnfblackbetrayal','clfnfbside','clfnfcamelliarudeblaster','clfnfcrunchin','clfnfdesolation','clfnfdokitakeoverplus','clfnfdropandroll','clfnfdustin','clfnffleetway','clfnffnaf3','clfnfgamebreakerbundle','clfnfgoldenapple','clfnfhex','clfnfholiday','clfnfhorkglorpgloop','clfnfhypnoslullaby','clfnfimposterv4','clfnfindiecross','clfnfmadnesspoop','clfnfmariomadnessdside','clfnfmidfight','clfnfmiku','clfnfmobmod','clfnfneo','clfnfpiggyfield','clfnfpokepastaperdition','clfnfqt','clfnfrevmixed','clfnfrewrite','clfnfselfpaced','clfnfshaggy4keys','clfnfshaggyxmatt','clfnfshucks-v2','clfnfshucksv2','clfnfsky','clfnfsoft','clfnfsonicexe','clfnfsonicexe4','clfnftailsgetstrolled','clfnftricky','clfnfwednesday-infedility','clfnfwhitty','clfnfzardy','clfocus','clfolderdungeon','clfootballbros','clfootballlegends','clforknsausage','clfortzone','clfpa4p1','clfpa4p2','clfreegemas','clfreerider','clfreerider2','clfreerider3','clfridaynightfunkin','clfromrusttoash','clfruitninja','clfunnybattle','clfunnybattle2','clfunnymadracing','clfunnyshooter2','clfunnyshooter22','clfzero','clfzerox','clgalaga','clgameandwatchcollection','clgangstabean','clgangstabean2','clgangsterbros','clgarcello','clgdlite','clgdsubzero','clgeneralchaos','clgenericfightermaybe','clgeometrydashscratch','clgeometryvibes','clgeorgeandtheprinter','clgetawayshootout','clgetontop','clGettothetopalthoughthereisnotop','clgetyoked','clghosttrick','clgimmietheairpod','clgladdihoppers','clgloryhunters','clglover','clgoalsouthafrica','clgobble','clgoingballs','clgolddiggerfrvr','clgoldeneye007','clgoldensun','clgoldensunnds','clGoldenSunTheLostAge','clgoldminer','clgolforbit','clgolfsunday','clgoodbigtowertinysquare','clgoodbigtowertinysquare2','clgoodboygalaxy','clgoodmonkeymart','clgooglebaseball','clgoogledino','clgorescriptclassic','clgrandactionsimulator-ny','clgranddad','clgrandtheftautoadvance','clgranny','clgranny2','clgranny22','clgranny3','clgranturismo','clgranturismo2','clgrassmowing','clgravity','clgravitymod','clgrey-box-testing','clgrimacebirthday','clgrindcraft','clgrn','clgrowagarden','clgrowdenio','clgrowyourgarden','clgta','clgta2','clgta22','clgta2alt','clgtaalt','clgtaalty','clgtachina','clguesstheiranswer','clgun-spin','clgunblood','clguncho','clgunknight','clgunmayhem','clgunmayhem2','clgunmayhem2goof','clgunmayhemredux','clgunnight','clgunsmoke','clgymstack','clhacx','clhajimeippo','clhalflife','clhalocombatdevolved','clhandshakes','clhandsofwar (1)','clhandsofwar(1)','clhandsofwar(2)','clhandsofwar','clhandulum','clhanger2','clhappyroom','clhappywheels','clhardwaretycoon','clHaroldsbadday','clharvestio','clharvestmoon','clharvestmoon64','clhauntthehouse','clheartandsoul','clhei$t','clhelixjump','clhellron','clhelpnobrakes','clhero3flyingrobot','clhextris','clhighstakes','clhighwayracer2','clhighwaytraffic3d','clhillclimbracinglite','clHiNoHomo','clhipsterkickball','clhit8ox','clhitsinglereal','clhl2doom','clhobo','clhobo2','clhobo3','clhobo4','clhobo5','clhobo6','clhobo7','clhobovszombies','clholeio','clhollowknight','clhouseofhazards','clhoverracerdrive','clhumanexpenditureprogram','clhungryknight','clhungrylamu','clhyppersandbox','clicantbelievegoogleflaggedmeforthenameofthefilelol','clice age baby','clicedodo','clicypurplehead','clidlebreakout','clidledice','clidleidlegamedev','clidleminertycoon','clidleminorzamnshes12','climpossiblequiz (1)','climpossiblequiz','climpossiblequiz2','clinclementemerald','clindiantrucksimiulator','clinfinitecraft','clinkgame','clinnkeeper','clinsidestory','clinteractivebuddy','clintoruins','clintospace','clintospace2','clintospace3','clintothedeepweb','clintrusion','cliqball','clironsnout','clironsoldier','cliwbtg','cljacksmith','cljacksmithencryptedorsmthn','cljailbreakobbbobob','cljefflings','cljellydadhero','cljellydrift','cljellytruck','cljellytruckgood','cljetforcegemini','cljetpackjoyride','cljetrush','cljetskiracing','cljohnnytrigger','cljohnnyupgrade','cljourneydownhill','cljsvecx','clJUMP','cljumpingshell','cljustfalllol','cljusthitthebutton','cljustoneboss','clkaizomarioworld','clkalikan','clkapi','clkaratebros','clkarlson','clkartbros','clKenGriffeyJrPresentsMajorLeagueBaseball','clkillerinstinct','clkillover','clkilltheiceagebabyadventure','clkingdomheartsdays','clkingdomheartsrecoded','clkingdomheartsrecodedalt','clkirby64','clkirbyandtheamzingmirror','clkirbysadventure','clkirbysdreamland','clkirbysdreamland3','clkirbysqueaksquad','clkirbysuperstar','clkirbysuperstarultra','clkittencannon','clklifur','clknifehit','clknightmaretower','clkonkrio','clkoopasrevenge','clkourio','cllaceysflashgames','cllastfirered','cllasthorizon','cllaststand','cllaststand2','clleaderstrike','cllearntofly','cllearntofly2','cllearntofly3','cllearntoflyidle','cllegobatman','cllegobatman2superheroes','cllegoindianajones','cllegoindianajones2','cllegoninjago','cllegostarwars','cllemmings','clleveldevil','clleverwarriors','cllightitup','cllilrunmo','cllinerider','cllinktothepast','cllittlerunmo','cllockthedoor','clloderunner','cllonewolf','cllosangelesshark','cllowknight','clloz1','cllozlinkawakening','cllozminishcap','cllozoracleofseasons','cllozspirittracks','clluckyblocks','clmadalinstuntcars','clmadalinstuntcarsgood','clmadalinstuntcarsmultiplayerfixed','clmadden93','clmadden94','clmadden95','clmadden96','clmadden99','clmaddenfootball','clmaddenfootball64','clmaddennfl','clmaddennfl2000','clmaddennfl2001','clmaddennfl2002','clmaddy98','clmadness-retaliation','clmadnessaccelerant','clmadnesscombatdefense','clmadnesscombatenexus','clmadnessgemini','clmadnesshydraulic','clmadnessinteractive','clmadnessoffcolor','clmadnesspremediation','clmadnessretaliation','clmadnesss2010','clmadnessstand','clmadskillsmotocross2','clmadstick','clmadstuntcars2','clmagictiles3','clmajorasmask','clmakesureitsclosed','clmanagod','clmario3','clmarioandluigisuperstarsaga','clmariocombat','clmariogolf','clMarioisMissingDoneRight','clmariokart64','clmariokartds','clmariokartsupercircuit','clmariomadness','clmariominusrabbids','clmariopaint','clmarioparty','clmarioparty2','clmarioparty3','clmariopartyds','clmariosmysterymeat','clmariotennis','clmaskedforcesunlimited','clmastermindworldconquerer','clmatrixrampage','clmattv2','clmcfpsfbhd','clmcraerally','clmeatboy','clmeatboyflash','clmedalofhonor','clmedievalshark','clmedievil','clmegachess','clmegaman','clmegaman2','clmegaman2gba','clmegaman3','clmegaman4','clmegaman5','clmegaman6','clmegaman7','clmegaman8','clmegamanlegends','clmegamanlegends2','clmegamanx','clmegamanx2','clmegamanx3','clmegamanx4','clmegamanzero','clmegamanzx','clmegaminer','clmelonplayground','clmeowuwu','clmergeroundracers','clmetalgear','clmetalgearsolid','clmetalgearsolidps','clmetalslugadvance','clmetalslugmission1','clmetalslugmission2','clMetalSonicHyperdrive','clmetroid','clmetroid2','clmetroidfusion','clmetroidzeromission','clmiamishark','clmicromages','clmightyknight','clmightyknight2','clmimic','clmindscape','clminecraft1-8-8','clminecraftshooter','clmineshooter','clminesweeperplus','clminhero','clminicrossword','clminimart','clminishooters','clminitooth','clmiraginewar','clmisslecommand','clmk4ampedup','clmmwilywars','clmobcontrolhtml5','clmobiusrevolution','clmoneyrush','clmonkeymart','clmonkeymartenc','clmonstertracks','clmonstertruckportstunt','clmortalkombat','clmortalkombat2','clmortalkombat3','clmortalkombatadvance','clmortkom4','clmotherload','clmotoroadrash','clmotox3m2','clmotox3m3','clmotox3mm','clmotox3mpoolparty','clmotox3mspookyland','clmotox3mwinter','clmountainbikeracer','clmrracer','clmspacman','clmultitask','clmutilate-a-doll','clmxoffroadmaster','clmyfriendpedro','clmyfriendpedroarena','clmyteardrop','cln','clnarc','clnaturalselection','clNBAhangtime','clNBAjam','clnbajamTE','clneonblaster','clneonrider','clnesworldchampion','clnetattack','clneverendinglegacy','clnewgroundsrumble','clnewsupermariobros','clNewSuperMarioWorld2AroundtheWorld','clnewyorkshark','clnextdoor','clnflblitz','clnfscarbonowncity','clnfsmostwanted','clnfsporcheunleashed','clnfsunderground','clnfsunderground2','clngon','clnhl2002','clnhlhitz2003','clnickelodeonsuperbrawl2','clNicktoonsFreezeFrameFrenzy','clnightclubshowdown','clnightfire','clnightshade','clnimrods','clninjabrawl','clnintendogslab','clnintendoworldcup','clnitromemustdie','clnoobminer','clnotyourpawn','clnplus','clnubbysnumberfactory','clnullkevin','clNutsandBoltsScrewingPuzzle','clnzp','clobby-99-will-lose','clobbyonlyup','clobeythegame','clocarinaoftime','clofflineparadise','clomeganuggetclicker','clonebitadventure','clonenightasfreddy','clonepiece','clonepiecefighting','clonlyup','cloperius','cloppositeday','clopposumcountry','clorbofcreation','clordinarysonicromhack','cloregontrail','closu','clourpleguy','clovo','clovo2','clovodimensions','clovofixed','clpacman','clpacmansuperfast','clpapabakeria','clpapadonut','clpapalouienighthunt2','clpapalouiewhenburgersattack','clpapalouiewhenpizzasattack','clpapalouiewhensundaesattack','clpapapizzagood','clpapapizzagoody','clpapapizzamamamia','clpapasburgerIIIAAAAA','clpapascheeseria','clpapascupcakeria','clpapasfreezeria','clpapashotdoggeria','clpapaspancakeria','clpapaspastaria','clpapasscooperia','clpapassushiria','clpapastacomia','clpapaswingeria','clpaperio','clpaperio3d','clpaperiomania','clpapermario','clpapermariopromode','clpapermariottyd','clparappatherapper','clparappatherapperalt','clparkingfury','clparkingfury2','clparkingfury3','clparkingrush','clpartnersintime','clpeacekeeper','clpeggle','clpenaltykicks','clpenguindiner','clpenguinpass','clpepsiman','clpepsimanalt','clpereelous','clperfectdark','clperfecthotel','clpersona','clpersona2','clpersona2alt','clpersonaalt','clphasma','clpheonixjusticeforall','clpheonixrightaceattorny','clpheonixtrialsandyear','clpheonixtrialsandyeartrhfasd','clpibbyapocalypse','clpico8','clpico8edu','clpicodriller','clpicohot','clpicolife','clpiconightpunkin','clpicosschool','clpicovsbeardx','clpingpongchaos','clpinkbike','clpitfall','clpitof100trials','clpixelbattlegroundsio','clpixelcombat2','clpixelquestlostidols','clpixelshooter','clpixelspeedrun','clpixelwarfare','clpizzapapa','clpizzatower','clplangman','clplantsvszombies','clplazmaburst','clplinko','clplonky','clpogo3D','clpokebattlefact','clpokeblack','clpokeblack2','clpokeblack2alt','clpokeblackalt','clpokeblazeblack2redux','clpokeblue','clpokeclassic','clpokecrown','clpokecrystalclear','clpokediamond','clpokedreamstone','clpokeeliteredux','clpokeelysiuma','clpokeelysiumb','clpokeemeraldenhanced','clpokeemeraldexceeded','clpokeemeraldhorizons','clpokeemeraldrandom','clpokefiregold','clpokeflora','clpokegaia','clpokegschronicles','clpokeheartgold','clpokelightplatinum','clpokeliquidcrysta','clpokemegamoemon','clpokemonamnesia','clpokemonclover','clpokemoncrystal','clpokemonemerald','clpokemonemeraldcrest','clpokemonemeraldimperium','clpokemonemeraldkaizo','clpokemonemeraldmini','clPokemonemeraldrouge','clpokemonemeraldseaglass','clpokemonenergizedemerald','clpokemonevolvedsfdgsdfs','clpokemonfirered','clpokemonfireredandleafgreenplusedition','clpokemonfireredrandomized','clpokemongold','clpokemonkaizoironfirered','clpokemonlazarus','clpokemonleafgreen','clpokemonmodernemerald','clpokemonmysterydungeon','clpokemonquetzal','clpokemonroaringred','clPokemonrocketedition','clpokemonruby','clpokemonsapphire','clpokemonshinsigma','clpokemonsilver','clpokemonsnap','clpokemonstadium','clpokemontowerdefense','clpokemonultimatefusion','clpokemonunbound','clpokemysteryexplorersofsky','clpokeodyssey','clpokepearl','clpokeperfectfirered','clpokepisces','clpokeplatinum','clpokeplatinumrandomized','clpokerechargedpink','clpokerechargedyellow','clpokerecordkeepers','clpokered','clpokerocketedition','clpokerowe','clpokeruby','clpokerunandbun','clpokescorchedsilver','clpokesoulsilver','clpokethepit','clpoketourmaline','clpokeultraviolet','clpokeunovaemerald','clpokevega','clpokevoltwhite2redux','clpokevoyager','clpokewhite','clpokewhite2','clpokewhite2alt','clpokeyellow','clpolicepursuit2','clpolishedcrystal','clpoorbunny','clpopeyepapi','clporklike','clportal','clportal2d','clportaldefendersfastbreak','clportaldefendersTD','clportalflash','clporter','clpossessquest','clpostal','clpotatomanseeksthetroof','clpou','clpraxisfighterx','clprebronzeage','clprecivilationbronzeage','clprehistoricshark','clprimary','clpullfrog','clpunchout','clpunchthedrump','clpunchthetrump','clpuppethockey','clpushyourluck','clpuyopuyofever','clpvz','clpvz2','clpvz2gardenless','clpyrotoad','clqbert','clquake2','clquake3','clquake64','clquickieworld','clqwop','clracemaster3d','clracingarena','clradicalred','clradracer','clraftwars','clraftwars2','clragdoll-io','clragdollarchers','clragdollhit','clragdollrunners','clragdollsoccer','clragollhit','clrainbowsix','clrainbowsixalt','clray1','clray2','clrayman','clraze','clraze2','clraze3','clre3','clreachthecore','clrealflightsim','clrebuild','clrebuild2','clrecoil','clredball','clredball2','clredball3','clredball4','clredball4vol2','clredball4vol3','clredhanded','clredtierunner','clredvsblue2','clredvsbluewar','clreignofcentipede','clrenegades','clresidentevil','clresidentevil2','clresizer','clresortempire','clretrobowl','clretrobowlcollege','clretrohighway','clretropingpong','clreturnman','clreturnman2','clreturntoriddleschool','clrevolutionidle','clrhythmheaven','clrhythymymheaven','clricochetkills2','clriddlemiddleschool','clriddleschool','clriddleschool2','clriddleschool3','clriddletransfer','clriddletransfer2','clridgeracer','clroadfighter','clroadoffury','clroadofthedead','clroadofthedead2','clrocketjump','clrocketknightadventures','clrocketleague','clrocketpult','clrocketsoccerderby','clrodha','clroguesoul','clroguesoul2','clrollerballer','clrollingsky','clrollyvortex','clrolypolymonster','clrooftopsnipers','clrooftopsnipers2','clroomclicker','clrotate','clrouletteknight','clruffle','clrun-2','clrun','clrun2','clrun3','clrussiancardriver','clsandboxcity','clsandboxels','clsandsofthecoliseum','clsandtris','clsantarun','clsaszombieassault2','clsaulgoodmanrun','clscarletshift','clscarymazegame','clscrapmetal3','clscrapyarddog','clscribblenauts','clscubabear','clseamongrel','clsecretofmana','clsega2gg','clsentryfortress','clserenitrove','clservingupmadness','clsfk','clsfk2','clsfklaststand','clsfkleague','clshaggy','clshc1','clshc2','clshc3','clshift','clshift2','clshift3','clshinmegamitenseidevilsurvivor','clshortlife','clshredmill','clshrek-2','clshrubnaut','clshwultimatem','clsideeffects','clsidepocket','clsierra7','clsilenthill','clsilenthillalt','clsilk','clsiloshowdow','clSINGLEFILE','clsixwaystodie','clskateit','clskibidiinthebackrooms','clskibidishooter','clskong','clskyrace-3d','clsliceitall','clslideinthewoods','clslimelabratory','clslipways','clslitherio','clslope','clslope2player','clslope3','clslopeplus','clslotornot','clslowroads','clsm63redux','clsmadvance2','clsmadvance3','clsmashkarts','clsmashkartsworking','clsmashremix','clsmbc','clsmbcrossover','clsmbgameover','clsnailbob','clsnailbob2','clsnailbob3','clsnailbob4space','clsnailbob5lovestory','clsnakeis','clsnakelike','clsnipershot','clsniperv2','clsnowballio','clsnowrid','clsnowrideee','clsnowrider','clsnowridergoodygumdrops','clsnowriderrrr','clsnowroad','clsoccerbros','clsoccerrandom','clsoccerrandomgood','clsolarsandbox','clsolarsmash','clsolitaire','clsonic1contemporary','clSonic1ScoreRush','clSonic2ScoreRush','clsonic3andknuckles','clsonic3complete','clsonic3dblastdx','clsonicadvance','clsonicadvance2','clsonicadvance2sp','clsonicadvance3','clsonicandashuro','clsonicandknuckles','clsonicbattle','clsoniccd','clsonicclassiccollection','clsonicclassicheroes','clsoniccolors','clsonicdeltaorigins','clsoniceexeog','clsonicerazor','clsonicgg','clSonicHellfireSaga','clsonicjam','clsonicmegamix','clsonicr','clsonicralt','clsonicrevert','clsonicrush','clsonicrushadventure','clsonicspinball','clsonicthehedgehog','clsonicthehedgehog2','clsonicthehedgehog3','clsonny2','clsouljumper','clspacebarclicker','clspacecompany','clspaceinvaders','clspaceiskey','clspaceiskey2','clspaceiskeyxmas','clspacewarsbattleground','clspacewaves','clspeedperclick','clspeedstars','clspewer','clspiralroll','clsprunked','clsprunki','clsprunkiclicker','clsquidplayground','clstackballio','clstacktris','clstackydash','clstarfox','clstarfox64','clstarraiders','clstateio','clstation141','clstationmeltdown','clstationsaturn','clsteakandjake','clstealbrainrotonline','clstealthassassin','clstealthmaster','clsteelempire','clsteelsurge','clstickarchersbattle','clstickfighter','clstickjetchallenge','clstickmanandguns','clstickmanclash','clstickmanduel','clstickmangtacity','clstickmanhook','clStickmanKingdomclash','clstickmankombat2d','clstickmanstealingdiamond','clstickmerge','clstickminairship','clstickminbreakingbank','clstickminescapingprison','clstickminfleecomplex','clstickrpgcomplete','clstickslasher','clstickwar','clstickwar2','clstormthehouse','clstormthehouse3','clstrangejournet','clstreangeropepolice','clstreetfighter2','clstreetfighter2turbo','clstreetfighteralpha3','clstreetfighterumuhsomething','clstreetofrage','clstreetofrage2','clstreetofrage3','clstrikeforceheroes','clstrikeforceheroes2','clstrikeforceheroes3','clstrikerdummies','clstylesavvy','clsubwaysurfersbarcelona','clsubwaysurfersbeijing','clsubwaysurfersberlin','clsubwaysurfersbuenosaires','clsubwaysurfershavana','clsubwaysurfershouston','clsubwaysurfersiceland','clsubwaysurferslondon','clsubwaysurfersmexico','clsubwaysurfersmiami','clsubwaysurfersmonaco','clsubwaysurfersneworeleans','clsubwaysurfersneworleans','clsubwaysurferssanfrancisco (1)','clsubwaysurferssanfrancisco(1)','clsubwaysurferssanfrancisco','clsubwaysurfersstpetersburg','clsubwaysurferswinterholiday','clsubwaysurferszurich','clsugarsugar','clsuika','clsuikapico','clsunandmoon','clsuperbomberman','clsuperbomberman2','clsuperbomberman3','clsuperbomberman4','clsuperbomberman5','clsupercarrush','clsupercastlevaniaVI','clsuperchibiknight','clsupercold','clsuperdarkdeception','clsuperdiagonalmario2','clsuperfighters','clsuperhot','clsuperhotlinemiami','clsuperhouseofdeadninjas','clsuperislandadventure','clsuperkidadventure','clsuperliquidsoccer','clsupermario','clsupermario63','clsupermario64','clsupermario64ds','clsupermarioallstars','clsupermariobros','clsupermariobros2','clsupermariobros2us','clsupermariobros3','clsupermariobros3real','clsupermariokart','clsupermarioland','clsupermarioland2','clsupermariomon','clsupermariorpg','clsupermarioworld','clsupermarioworld2','clSuperMarioWorldThe SecretOfThe7GoldenStatues','clsupermetroid','clsupermonkeyballjr','clsupernoahsark3D','clsuperoliverworld','clsuperpickleballadventure','clsuperpunchout','clsuperpuzzlefighter2turbo','clsuperpuzzlefighter2turboalt','clsuperscribblenauts','clsupersmashbros','clsupersmashflash','clsupersmashflash2','clsupersmashflash2butdifversion','clsupertiltbros','clsupitdept','clsupremeduelist','clsurvevio','clsurvivalracev2','clsushicat','clsushicat2','clsushiunroll','clswerve','clswitchblade','clswordandshieldultimateplus','clswordfight','clswordplay','clswordsandsandals','clswordsandsandals2','clswordsandsouls','clsydneyshark','cltabletanks','cltabletennisworldtour','cltag-','cltagc3','clTaikonoTatsujin','cltaisei','cltakeover','cltallmanrun','cltankmayhem','cltankpixel','cltanukisunset','cltanukisunsetuhhhhhhhh','cltapper','cltaproad','cltastyplanet','cltboilambeternal','cltecmobowl','cltelephonetrouble','cltelocation','cltempest2000','cltempleofboom','cltemplerun2','cltempoverdose','clterra','clterritorialio','clterritorywar','cltetris','cltetrisattack','cltetrisgba','cltheclassroom','cltheclassroom2','cltheclassroom3','clthedeadseat','clthedeepestsleep','cltheenchantedcave2','cltheimpossiblegame','cltheincrediblemachine','clthelaststand','clthelaststandunioncity (1)','clthelaststandunioncity','clthemaninthewindow','clthemepark','clthepit','clthereisnofile','clthermomorph','clthisistheonlylevel','clthisistheonlylevel2','clthisistheonlyleveltoo','clthreegoblets','clthrowapotato','clthrowapotatoagain','clthwack','cltimeshooter2','cltimeshooter3','cltimewarriors','cltinyfishing','cltmnt','cltoastarling','cltoasterball','cltombofthemass','cltommorowandyesterday','cltomodachicollection','cltonyhawkskater2','cltonyhawkskater4','cltonyhawksunderground','cltoomanytypes','cltopspeedracing3d','cltosstheturtle','cltotm','cltowerblocks','cltowercrash3d','cltownscraper','cltrace','cltrafficjam3d','cltrapthecat','cltrechoroustrials','cltrechoroustrialspart2','cltriachnid','cltripleplay2000','cltriviacrack','cltrollfacequest1','cltrollfacequest10','cltrollfacequest11','cltrollfacequest12','cltrollfacequest13','cltrollfacequest2','cltrollfacequest3','cltrollfacequest4','cltrollfacequest5','cltrollfacequest6','cltrollfacequest7','cltrollfacequest8','cltrollfacequest9','cltrucksim','cltubejumpers','cltunnelrush','cltunnelrushbetter','clturbostars','clturokdinosaurhunter','cltwinshot (1)','cltwinshot(1)','cltwinshot','cltwistedmetal','cltwistedmetal2','cltwoball3d','clucds','cluckyblockobbyEUOPHRATESRIVER','clufoswampoddysey','clultimateassassian2','clultimateassassian3','clUltimatecardrivingsimulator','clultimatemortalkombat','clultimatemortalkombat3','clultrakill','clumstickmangameidkiforgor','cluncannycatgolf','clunderneath','clundertaler','clundertaleyellow','clunfairmario','clunfairmarioworkquestionmark','clunfairundyne','clunicyclehero','cluno','cluntime','clupgradecomplete','clupgradecomplete2','clupslash','clUZG','clvampiresurvivors','clvanguard','clvaportrails','clvex','clvex2','clvex3','clvex3xmas','clvex4','clvex5','clvex6','clvex7','clvex8','clvexchallenges','clvexx3m','clvexx3m2','clvillager','clvincentmansionofthedead','clvisitor','clvolleyrandom','clvollyballchallenge','clvvvvvv','clwaluigitacostand','clwarfare1944','clwarioland4','clwariowarediy','clwariowareinc','clwartheknight','clwaterpoolio','clwavedash','clwaverace64','clwaverun','clwebecomewhatwebehold','clwebfishing','clweltling','clwermhole','clwhackthetheif','clwhackyourboss','clwhackyourcomputer','clwheelibike','clwheely','clwheely2','clwheely3','clwheely4','clwheely5','clwheely6','clwheely7','clwheely8','clwindowsdoors','clwinterfalling','clwipeout2097','clwipeout2097alt','clwitchcrafttd','clwolfenstein','clwolfenstein3d','clwoodworm','clwordle','clworldcup98','clworldshardestgame','clworldshardestgame2','clworldshardestgame3','clworldshardestgame4','clwrassling','clwrestlebros','clXevious','clyanderesimulator','clyarsrevenge','clyellow','clYoshisStrangeQuest','clyouarelucky','clyouvs100skibidi(1)','clyouvs100skibidi','clyumenikki','clzelda2thelegendoflink','clzeldaminishcap','clzenword','clzombieexploder','clzombieroad','clzombierush','clzombiesatemyneighboors','clzombopaclypse2','clzombotron','clzombotron2','clzombotronreboot','clzrist','clzuma','clzumashooter','codeorg','Dragonxclient','Eaglercraft-Alpha-1.2.6-Offline','Eaglercraft-Beta-1.3-Offline','Eaglercraft-Indev-Offline (1)','Eaglercraft-Indev-Offline','eaglercraft.1.5.2','EaglercraftL_1.9_v0_7_0_Offline_Signed','EaglercraftX 1.8.8(u29)','EaglercraftZ_1.11.2','marbleracer','mariobuilder64','Minceraft-I-NotMine_V6','mortalkombat4','polytrackbutnotflagged','rocketknight2','sandstone','snowbros','superdromebugs'];
+
+const indexById={};const seen=new Set();
+files.forEach(f=>{
+  if(!f.trim()||f==='filenames.txt'||f==='sdf')return;
+  const l=f.toLowerCase();let display,id,openArg;
+  if(l.startsWith('cl')){display=f.substring(2);id='cl'+display;openArg='cl'+display;}
+  else{display=f;id=f;openArg=f;}
+  if(!display.trim()||seen.has(id))return;
+  seen.add(id);
+  const cat=getCategory(display);
+  indexById[id]={id,display,openArg,cat};
+});
+
+const allGames=Object.values(indexById);
+const totalGames=allGames.length;
+document.getElementById('game-count-num').textContent=totalGames.toLocaleString();
+const catCounts={};allGames.forEach(g=>{catCounts[g.cat]=(catCounts[g.cat]||0)+1;});
+
+// TICKER
+const tickerInner=document.getElementById('ticker-inner');
+const tickerItems=['⚡ HUNDREDS OF GAMES','★ SAVE FAVORITES','🎮 PLAY INSTANTLY','👾 NO DOWNLOAD NEEDED','🏆 CLASSIC ARCADE','🕹️ EBN GAMEZ','⭐ UNBLOCKED','🔥 ALWAYS ONLINE'];
+[...tickerItems,...tickerItems].forEach(t=>{const s=document.createElement('span');s.className='ticker-item';s.textContent=t;tickerInner.appendChild(s);});
+
+function openFile(openArg,id){
+  addRecent(id);
+  const settings=loadSettings();
+  const name=openArg.includes('.')?openArg:openArg+'.html';
+  const url='https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/'+encodeURIComponent(name)+'?t='+Date.now();
+  if(settings.openBlank!==false){
+    fetch(url).then(r=>r.text()).then(t=>{const w=window.open('about:blank','_blank');w.document.write(t);w.document.close();});
+  } else {
+    window.open(url,'_blank');
+  }
+  renderView(currentCat);
+}
+
+function makeCard(item,sub){
+  const{id,display,cat}=item;
+  const catDef=CATEGORIES.find(c=>c.id===cat)||CATEGORIES[CATEGORIES.length-1];
+  const themeClass=CAT_THEME[catDef.color]||'theme-cyan';
+  const card=document.createElement('div');
+  card.className='card';card.dataset.id=id;card.dataset.title=display.toLowerCase();
+  const iconRow=document.createElement('div');iconRow.className='card-icon-row';
+  const emoji=document.createElement('span');emoji.className='card-emoji';emoji.textContent=CAT_EMOJI[cat]||'🎮';
+  const pill=document.createElement('span');pill.className='card-cat-pill '+themeClass;pill.textContent=catDef.label.split(' ')[0];
+  iconRow.appendChild(emoji);iconRow.appendChild(pill);
+  const title=document.createElement('div');title.className='card-title';title.textContent=display;
+  const subEl=document.createElement('div');subEl.className='card-sub';subEl.textContent=sub||'> CLICK TO PLAY';
+  const overlay=document.createElement('div');overlay.className='card-play-overlay';
+  const playBtn=document.createElement('div');playBtn.className='play-btn-retro';playBtn.textContent='▶ PLAY';
+  overlay.appendChild(playBtn);
+  const fav=document.createElement('button');fav.className='fav'+(isFavorite(id)?' on':'');fav.type='button';fav.textContent='★';fav.title='Favorite';
+  fav.addEventListener('click',e=>{
+    e.stopPropagation();toggleFavorite(id);
+    document.querySelectorAll('.card[data-id="'+id+'"] .fav').forEach(f=>f.classList.toggle('on',isFavorite(id)));
+    showToast(isFavorite(id)?'★ ADDED TO FAVORITES':'☆ REMOVED');
+    if(currentCat==='favorites')renderView('favorites');
+  });
+  card.appendChild(iconRow);card.appendChild(title);card.appendChild(subEl);card.appendChild(overlay);card.appendChild(fav);
+  card.onclick=()=>openFile(item.openArg,id);
+  return card;
+}
+
+let currentCat='all',currentSearch='';
+
+function renderView(catId){
+  currentCat=catId;
+  const main=document.getElementById('main');
+  const noResults=document.getElementById('no-results');
+  main.querySelectorAll('.section-header,.grid').forEach(el=>el.remove());
+  const state=loadState();
+  let items=[];
+  if(catId==='favorites')items=state.favorites.map(id=>indexById[id]).filter(Boolean);
+  else if(catId==='recents')items=[...state.recents].sort((a,b)=>b.t-a.t).map(r=>({...indexById[r.id],t:r.t})).filter(Boolean);
+  else if(catId==='all')items=[...allGames].sort((a,b)=>a.display.localeCompare(b.display));
+  else items=allGames.filter(g=>g.cat===catId).sort((a,b)=>a.display.localeCompare(b.display));
+  // Filter broken if enabled
+  const settings=loadSettings();
+  if(settings.hideBroken){const broken=loadBroken();items=items.filter(g=>!broken.includes(g.id));}
+  if(currentSearch)items=items.filter(g=>g.display.toLowerCase().includes(currentSearch));
+  noResults.style.display=items.length===0?'block':'none';
+  if(items.length===0)return;
+  const catDef=CATEGORIES.find(c=>c.id===catId);
+  const colorKey=catDef?.color||'cyan';
+  const titleColorClass={cyan:'',mag:'magenta',yellow:'yellow',green:'',orange:'yellow',red:''}[colorKey]||'';
+  const hdr=document.createElement('div');hdr.className='section-header';
+  const titleEl=document.createElement('div');titleEl.className='section-title'+(titleColorClass?' '+titleColorClass:'');titleEl.textContent=catDef?.label||'GAMES';
+  const rule=document.createElement('div');rule.className='section-rule';
+  const badge=document.createElement('div');badge.className='section-count-badge';badge.textContent=items.length+' GAME'+(items.length!==1?'S':'');
+  hdr.appendChild(titleEl);hdr.appendChild(rule);hdr.appendChild(badge);
+  if(catId==='favorites'||catId==='recents'){
+    const clearBtn=document.createElement('button');clearBtn.className='retro-btn';clearBtn.textContent='[CLEAR]';
+    clearBtn.onclick=()=>{catId==='favorites'?clearFavorites():clearRecents();renderView(catId);};
+    hdr.appendChild(clearBtn);
+  }
+  main.insertBefore(hdr,noResults);
+  const grid=document.createElement('div');grid.className='grid';
+  items.forEach((item,i)=>{
+    let sub='> CLICK TO PLAY';
+    if(catId==='recents'&&item.t)sub='> PLAYED '+timeAgo(item.t);
+    if(catId==='favorites')sub='> FAVORITE';
+    const card=makeCard(item,sub);
+    card.style.animationDelay=Math.min(i*0.015,0.5)+'s';
+    grid.appendChild(card);
+  });
+  main.insertBefore(grid,noResults);
+}
+
+function setActiveCat(catId){
+  document.querySelectorAll('.cat-pill').forEach(b=>b.classList.toggle('active',b.dataset.cat===catId));
+  const pill=document.querySelector('.cat-pill[data-cat="'+catId+'"]');
+  if(pill)pill.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+
+function buildCatNav(){
+  const pillsContainer=document.getElementById('cat-pills');
+  CATEGORIES.forEach(cat=>{
+    const count=cat.id==='all'?totalGames:cat.id==='favorites'?loadState().favorites.length:cat.id==='recents'?loadState().recents.length:(catCounts[cat.id]||0);
+    if(count===0&&cat.id!=='all'&&cat.id!=='favorites'&&cat.id!=='recents')return;
+    const pill=document.createElement('button');pill.className='cat-pill'+(cat.id==='all'?' active':'');pill.dataset.cat=cat.id;
+    pill.innerHTML='<span class="cat-pill-icon">'+cat.icon+'</span>'+cat.label+'<span class="cat-pill-count">'+count+'</span>';
+    pill.onclick=()=>{
+      setActiveCat(cat.id);currentSearch='';document.getElementById('search').value='';
+      renderView(cat.id);window.scrollTo({top:0,behavior:'smooth'});
+    };
+    pillsContainer.appendChild(pill);
+  });
+}
+
+document.getElementById('search').addEventListener('input',e=>{
+  currentSearch=e.target.value.toLowerCase().trim();
+  if(currentSearch&&currentCat!=='all'){
+    setActiveCat('all');
+    currentCat='all';
+  }
+  renderView(currentCat);
+});
+
+// ===== CONTEXT MENU =====
+const ctxMenu=document.getElementById('ctx-menu');
+let ctxTarget=null;
+function closeCtx(){ctxMenu.classList.remove('open');ctxTarget=null;}
+document.addEventListener('click',closeCtx);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtx();});
+
+document.addEventListener('contextmenu',function(e){
+  const card=e.target.closest('.card');
+  if(!card)return;
+  e.preventDefault();
+  ctxTarget={id:card.dataset.id,openArg:indexById[card.dataset.id]?.openArg};
+  const broken=isBroken(ctxTarget.id);
+  document.getElementById('ctx-broken').textContent=broken?'✅ UNMARK BROKEN':'🚫 MARK AS BROKEN';
+  document.getElementById('ctx-broken').className='ctx-item danger';
+  document.getElementById('ctx-fav').textContent=isFavorite(ctxTarget.id)?'☆ REMOVE FAVORITE':'★ ADD FAVORITE';
+  const mx=Math.min(e.clientX,window.innerWidth-190);
+  const my=Math.min(e.clientY,window.innerHeight-130);
+  ctxMenu.style.left=mx+'px';ctxMenu.style.top=my+'px';
+  ctxMenu.classList.add('open');
+});
+
+document.getElementById('ctx-play').onclick=function(e){
+  e.stopPropagation();
+  if(ctxTarget)openFile(ctxTarget.openArg,ctxTarget.id);
+  closeCtx();
+};
+document.getElementById('ctx-fav').onclick=function(e){
+  e.stopPropagation();
+  if(ctxTarget){
+    toggleFavorite(ctxTarget.id);
+    document.querySelectorAll('.card[data-id="'+ctxTarget.id+'"] .fav').forEach(f=>f.classList.toggle('on',isFavorite(ctxTarget.id)));
+    showToast(isFavorite(ctxTarget.id)?'★ ADDED TO FAVORITES':'☆ REMOVED');
+    if(currentCat==='favorites')renderView('favorites');
+  }
+  closeCtx();
+};
+document.getElementById('ctx-broken').onclick=function(e){
+  e.stopPropagation();
+  if(ctxTarget){
+    if(isBroken(ctxTarget.id)){unmarkBroken(ctxTarget.id);showToast('✅ UNMARKED AS BROKEN');}
+    else{markBroken(ctxTarget.id);showToast('🚫 MARKED AS BROKEN');}
+  }
+  closeCtx();
+};
+
+function initLock(){
+  const overlay=document.getElementById('lockscreen');
+  const btn=document.getElementById('unlock');
+  const input=document.getElementById('pw');
+  const err=document.getElementById('pwerr');
+  function tryUnlock(){
+    if(input.value===PASSWORD){overlay.style.opacity='0';setTimeout(()=>overlay.remove(),700);}
+    else{err.style.display='block';input.value='';input.focus();}
+  }
+  btn.onclick=tryUnlock;
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
+}
+
+window.addEventListener('DOMContentLoaded',()=>{initLock();buildCatNav();renderView('all');});
+</script>
+</body>
+</html>
