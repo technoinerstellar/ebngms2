@@ -114,6 +114,10 @@
     /* SETTINGS BUTTON */
     .settings-btn{flex-shrink:0;background:transparent;border:2px solid var(--border);border-radius:2px;color:var(--dim);font-family:'VT323',monospace;font-size:22px;padding:6px 12px;cursor:pointer;transition:all .15s;line-height:1;}
     .settings-btn:hover{border-color:var(--cyan);color:var(--cyan);text-shadow:0 0 8px var(--cyan);}
+    .home-btn{flex-shrink:0;background:transparent;border:2px solid var(--border);border-radius:2px;color:var(--dim);font-family:'VT323',monospace;font-size:22px;padding:6px 12px;cursor:pointer;transition:all .15s;line-height:1;}
+    .home-btn:hover{border-color:var(--green);color:var(--green);text-shadow:0 0 8px var(--green);}
+    .fs-btn{flex-shrink:0;background:transparent;border:2px solid var(--border);border-radius:2px;color:var(--dim);font-family:'VT323',monospace;font-size:22px;padding:6px 12px;cursor:pointer;transition:all .15s;line-height:1;}
+    .fs-btn:hover{border-color:var(--magenta);color:var(--magenta);text-shadow:0 0 8px var(--magenta);}
 
     /* CAT SCROLL BAR (PILL NAV) */
     .cat-scroll-bar{position:sticky;top:70px;z-index:90;background:rgba(10,10,15,.96);border-bottom:2px solid var(--magenta);backdrop-filter:blur(10px);overflow:hidden;}
@@ -437,6 +441,16 @@
   </div>
 </main>
 
+<!-- GAME VIEWER -->
+<div id="game-viewer" style="display:none;position:fixed;inset:0;z-index:5000;background:var(--bg);flex-direction:column;">
+  <div id="game-chrome" style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:2px solid var(--cyan);flex-shrink:0;box-shadow:0 0 12px rgba(0,255,245,0.2);">
+    <span id="game-viewer-title" style="color:var(--cyan);font-size:14px;text-shadow:0 0 8px var(--cyan);flex:1;letter-spacing:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-family:'Press Start 2P',monospace;font-size:10px;"></span>
+    <button onclick="closeGame()" style="background:transparent;border:2px solid var(--green);border-radius:2px;color:var(--green);font-size:15px;padding:5px 14px;cursor:pointer;font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;transition:all 0.15s;box-shadow:0 0 6px var(--green);" onmouseover="this.style.background='rgba(0,255,136,0.1)'" onmouseout="this.style.background='transparent'">🏠 HOME</button>
+    <button onclick="fsGame()" id="game-fs-btn" style="background:transparent;border:2px solid var(--magenta);border-radius:2px;color:var(--magenta);font-size:15px;padding:5px 14px;cursor:pointer;font-family:'VT323',monospace;font-size:18px;letter-spacing:1px;transition:all 0.15s;box-shadow:0 0 6px var(--magenta);" onmouseover="this.style.background='rgba(255,0,204,0.1)'" onmouseout="this.style.background='transparent'">⛶ FULLSCREEN</button>
+  </div>
+  <iframe id="game-iframe" style="flex:1;width:100%;border:none;" allowfullscreen></iframe>
+</div>
+
 <script>
 const PASSWORD='uunnblocked';
 const STORAGE_KEY='ebn_link_organizer_v1';
@@ -444,7 +458,7 @@ const SETTINGS_KEY='ebn_settings_v1';
 const MAX_RECENTS=12;
 
 // ===== SETTINGS =====
-const SETTINGS_DEFAULTS={theme:'synthwave',openBlank:true,scanlines:true,tabName:'EBN GAMEZ',faviconUrl:null,hideBroken:false};
+const SETTINGS_DEFAULTS={theme:'synthwave',openBlank:false,scanlines:true,tabName:'EBN GAMEZ',faviconUrl:null,hideBroken:false};
 
 function loadSettings(){
   try{const s=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null');return Object.assign({},SETTINGS_DEFAULTS,s||{});}
@@ -525,7 +539,7 @@ function renderBrokenList(){
 function openSettings(){
   document.getElementById('settings-overlay').classList.add('open');
   const s=loadSettings();
-  document.getElementById('toggle-blank').checked=s.openBlank!==false;
+  document.getElementById('toggle-blank').checked=s.openBlank===true;
   document.getElementById('toggle-scanlines').checked=s.scanlines!==false;
   document.getElementById('toggle-hide-broken').checked=s.hideBroken===true;
   document.getElementById('tab-name-input').value=s.tabName||'EBN GAMEZ';
@@ -644,9 +658,18 @@ function openFile(openArg,id){
   const name=openArg.includes('.')?openArg:openArg+'.html';
   const url='https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/'+encodeURIComponent(name)+'?t='+Date.now();
   if(settings.openBlank!==false){
-    fetch(url).then(r=>r.text()).then(t=>{const w=window.open('about:blank','_blank');w.document.write(t);w.document.close();});
+    const w=window.open('about:blank','_blank');
+    fetch(url).then(r=>r.text()).then(t=>{w.document.write(t);w.document.close();});
   } else {
-    window.open(url,'_blank');
+    const viewer=document.getElementById('game-viewer');
+    const iframe=document.getElementById('game-iframe');
+    const titleEl=document.getElementById('game-viewer-title');
+    titleEl.textContent='\u25B6 '+openArg.replace('.html','');
+    iframe.srcdoc='<p style="color:white;font-family:monospace;padding:20px">Loading...</p>';
+    viewer.style.display='flex';
+    // Hide scanlines while in game
+    document.body.style.setProperty('--scanline','rgba(0,0,0,0)');
+    fetch(url).then(r=>r.text()).then(t=>{iframe.srcdoc=t;});
   }
   renderView(currentCat);
 }
@@ -812,7 +835,41 @@ function initLock(){
   input.addEventListener('keydown',e=>{if(e.key==='Enter')tryUnlock();});
 }
 
-window.addEventListener('DOMContentLoaded',()=>{initLock();buildCatNav();renderView('all');});
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+function closeGame(){
+  const viewer=document.getElementById('game-viewer');
+  const iframe=document.getElementById('game-iframe');
+  // Stop audio by replacing srcdoc before clearing
+  try{
+    const iwin=iframe.contentWindow;
+    if(iwin){
+      iwin.document.querySelectorAll('audio,video').forEach(el=>{el.pause();el.src='';});
+      const ctx=iwin.AudioContext||iwin.webkitAudioContext;
+      if(ctx)iwin.document.querySelectorAll('*').forEach(()=>{});
+    }
+  }catch(e){}
+  iframe.srcdoc='';
+  iframe.src='about:blank';
+  viewer.style.display='none';
+  // Restore scanlines
+  document.body.style.setProperty('--scanline', loadSettings().scanlines!==false ? 'rgba(0,0,0,0.18)' : 'rgba(0,0,0,0)');
+}
+function fsGame(){
+  const iframe=document.getElementById('game-iframe');
+  if(!document.fullscreenElement){iframe.requestFullscreen();}
+  else{document.exitFullscreen();}
+}
+
+function init(){initLock();buildCatNav();renderView('all');}
+if(document.readyState==='loading'){window.addEventListener('DOMContentLoaded',init);}
+else{init();}
 </script>
 </body>
 </html>
